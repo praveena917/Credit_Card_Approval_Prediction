@@ -1,0 +1,231 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Assessment Result</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="page">
+    <header class="masthead">
+      <p class="eyebrow">Applicant Risk Assessment</p>
+      <h1>Result for {{ applicant_name }}</h1>
+      <p>Model output based on application-form data only.</p>
+    </header>
+
+    <div class="card result-card">
+      <div class="gauge-wrap">
+        <svg width="220" height="130" viewBox="0 0 220 130">
+          <path d="M 20 110 A 90 90 0 0 1 200 110" fill="none" stroke="#DDE1E8" stroke-width="16" stroke-linecap="round"/>
+          <path d="M 20 110 A 90 90 0 0 1 200 110"
+                fill="none"
+                stroke="{{ '#B08D3F' if decision == 'Approve' else '#A6453D' }}"
+                stroke-width="16"
+                stroke-linecap="round"
+                stroke-dasharray="{{ (proba_approve / 100 * 282.6) | round(1) }} 282.6"/>
+          <text x="110" y="98" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="26" font-weight="600" fill="#232B3B">{{ proba_approve }}%</text>
+          <text x="110" y="118" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#6B7688" letter-spacing="0.04em">P(APPROVE)</text>
+        </svg>
+      </div>
+
+      <p class="decision-label {{ 'approve' if decision == 'Approve' else 'reject' }}">{{ decision }}</p>
+      <p class="decision-sub">Decision threshold: <strong>{{ threshold }}%</strong> &nbsp;·&nbsp; P(Reject) = <strong>{{ proba_reject }}%</strong></p>
+
+      <div class="disclosure">
+        <strong>Read this before acting on the result.</strong><br>
+        This model was tuned to prioritize catching risky applicants over raw accuracy, given how rare rejections are in the training data (~1.7%). On held-out test data it correctly identifies about <strong>33% of truly risky applicants</strong> (recall), and when it flags someone as risky, that flag is correct about <strong>36% of the time</strong> (precision). Application-form features alone have limited power to separate risky from safe applicants in this dataset — this is a documented property of the data, not a bug. Treat this output as one input to a human decision, not an automated final verdict.
+      </div>
+    </div>
+
+    <a class="back-link" href="/">&larr; Run another assessment</a>
+  </div>
+</body>
+</html> -->
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction Result</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+</head>
+
+<body>
+
+<nav>
+
+<div class="logo">
+<i class="fa-solid fa-credit-card"></i>
+CreditAI
+</div>
+
+<ul>
+
+<li><a href="/">Home</a></li>
+
+<li><a href="/prediction">Prediction</a></li>
+
+</ul>
+
+</nav>
+
+
+<div class="result-container">
+
+{% if error_message %}
+<div style="background:#FEF3C7;color:#92400E;padding:20px;border-radius:15px;margin-bottom:24px;font-size:18px;">
+<strong>Input validation:</strong> {{ error_message }}
+</div>
+{% endif %}
+
+{% if decision=="Approve" %}
+
+<i class="fa-solid fa-circle-check"
+style="font-size:90px;color:#22C55E;"></i>
+
+<h1 class="approved">
+
+Credit Approved
+
+</h1>
+
+{% else %}
+
+<i class="fa-solid fa-circle-xmark"
+style="font-size:90px;color:#EF4444;"></i>
+
+<h1 class="rejected">
+
+Credit Rejected
+
+</h1>
+
+{% endif %}
+
+
+<p style="font-size:20px;margin-top:15px;">
+
+Applicant :
+
+<b>{{ applicant_name }}</b>
+
+</p>
+
+
+<div class="result-circle">
+
+{{proba_approve}}%
+
+</div>
+
+<h2 style="margin-bottom:30px;">
+
+Approval Probability
+
+</h2>
+
+<div class="cards">
+
+<div class="card">
+
+<i class="fa-solid fa-thumbs-up"></i>
+
+<h3>Approval</h3>
+
+<h2>{{proba_approve}}%</h2>
+
+</div>
+
+<div class="card">
+
+<i class="fa-solid fa-triangle-exclamation"></i>
+
+<h3>Risk</h3>
+
+<h2>{{proba_reject}}%</h2>
+
+</div>
+
+<div class="card">
+
+<i class="fa-solid fa-sliders"></i>
+
+<h3>Threshold</h3>
+
+<h2>{{threshold}}%</h2>
+
+</div>
+
+</div>
+
+
+<div style="margin-top:40px;">
+
+{% if decision=="Approve" %}
+
+<div style="background:#22C55E;
+padding:20px;
+border-radius:15px;
+font-size:18px;">
+
+✔ Congratulations!
+
+The applicant satisfies the model requirements and is likely to receive credit card approval.
+
+</div>
+
+{% else %}
+
+<div style="background:#EF4444;
+padding:20px;
+border-radius:15px;
+font-size:18px;">
+
+❌ The applicant has a higher credit risk according to the AI model.
+
+Manual review is recommended before approval.
+
+</div>
+
+{% endif %}
+
+</div>
+
+
+<a href="/prediction" class="back-btn">
+
+<i class="fa-solid fa-arrow-left"></i>
+
+Predict Another Applicant
+
+</a>
+
+</div>
+
+
+<footer>
+
+<p>
+
+© 2026 CreditAI |
+Powered by Flask • Python • XGBoost
+
+</p>
+
+</footer>
+
+</body>
+
+</html>
